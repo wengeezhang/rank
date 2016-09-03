@@ -24,7 +24,11 @@ Rank.prototype={
           var result = task.fun(lastYieldVal);
           if(typeof result === 'object' && typeof result.then ==='function'){
             result.then(function(yieldVal){
-              loop(yieldVal);
+              if(yieldVal && yieldVal.errCode == -1){
+                console.log("stopped by ",task.name,"error:",yieldVal.msg);
+              }else{
+                loop(yieldVal);
+              }
             });
           }else{
             res("tasks finished");
@@ -39,51 +43,3 @@ Rank.prototype={
   }
 };
 Rank.prototype.constructor = Rank;
-
-
-var rank = new Rank([{
-  name: "date", 
-  fun: function(){
-    var task = this;
-    return new Promise(function(res,rej){
-      res(task.top[task.name] = '2016-05-21');  
-    });
-  }
-},{
-  name: "platform",
-  fun: function(arg){
-    var task = this;
-    return new Promise(function(res,rej){
-      setTimeout(function(){
-        res(task.top[task.name] = "platform:yyb");
-      },2000);
-    });
-  }
-},{
-  name: "uin",
-  fun: function() {
-    var task = this;
-    return new Promise(function(res,rej){
-      setTimeout(function(){
-        res(task.top[task.name] = task.top.platform+':'+'79821082');
-      },1000);  
-    });
-  }
-},{
-  name: "userInfo",
-  fun: function(){
-    var task = this;
-    return new Promise(function(res,rej){
-      setTimeout(function(){
-        res(task.top[task.name] = {date:task.top.date,uin:task.top.uin,name:'wengee',score:100});
-      },1000);
-    });
-  }
-},{
-  name: "pageInit",
-  fun: function(){
-    var task = this;
-    console.log(JSON.stringify(task.top.userInfo));
-  }
-}]);
-rank.run();
